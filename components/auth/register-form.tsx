@@ -3,7 +3,7 @@ import { useState } from "react";
 import { CardWrapper } from "./card-wrapper";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "@/types/auth";
+import { registerSchema } from "@/types/auth";
 import {
     Form,
     FormControl,
@@ -17,17 +17,18 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import * as z from "zod";
 import { useAction } from "next-safe-action/hooks";
-import { emailSignin } from "@/action/emailSign.action";
 import { FormError } from "./form-error";
 import { FormSuccess } from "./form-success";
+import { emailRegister } from "@/action/emailRegister.action";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
-export default function LoginForm() {
-    const { execute, result, status, isExecuting } = useAction(emailSignin);
+export default function RegisterForm() {
+    const { execute, result, status, isExecuting } = useAction(emailRegister);
     const [showPassword, setShowPassword] = useState(false);
     const form = useForm({
-        resolver: zodResolver(loginSchema),
+        resolver: zodResolver(registerSchema),
         defaultValues: {
+            username: "",
             email: "",
             password: ""
         }
@@ -35,26 +36,45 @@ export default function LoginForm() {
 
     const { handleSubmit, control, formState: { isValid, isSubmitting } } = form;
 
-    const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+    const onSubmit = async (values: z.infer<typeof registerSchema>) => {
         try {
             await execute(values);
             form.reset();
         } catch (error) {
-            console.error("Login failed:", error);
+            console.error("Register failed:", error);
         }
     };
 
     return (
         <CardWrapper
-            label="Welcome back!"
-            backButtonLabel="Create a new account"
-            backButtonHref="/register"
+            label="Create Your Account"
+            backButtonLabel="Already have an account? Login"
+            backButtonHref="/login"
             showSocials
             className="bg-white p-6 rounded-lg shadow-lg"
         >
             <div className="max-w-sm mx-auto">
                 <Form {...form}>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                        <FormField
+                            control={control}
+                            name="username"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-lg font-semibold text-gray-800">UserName</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            placeholder="Enter your userName"
+                                            {...field}
+                                            disabled={isExecuting}
+                                            className="border border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                        />
+                                    </FormControl>
+                                    <FormDescription className="text-sm text-gray-500"></FormDescription>
+                                    <FormMessage className="text-red-500" />
+                                </FormItem>
+                            )}
+                        />
                         <FormField
                             control={control}
                             name="email"
@@ -114,7 +134,7 @@ export default function LoginForm() {
                                 className="w-full bg-violet-600 text-white rounded-md py-3 hover:bg-violet-700 transition-colors duration-300"
                                 disabled={isSubmitting || !isValid}
                             >
-                                {isExecuting ? "😆" : "Login"}
+                                {isExecuting ? "😆" : "Register"}
                             </Button>
                         </div>
                     </form>
