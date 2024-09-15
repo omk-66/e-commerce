@@ -7,7 +7,7 @@ export async function NavBar() {
     const user = session?.user;
 
     return (
-        <header className="w-full py-4 flex flex-col">
+        <header className="w-full py-4 flex flex-col border-b border-gray-300 shadow-lg">
             <nav>
                 <ul className="flex justify-between px-10">
                     <li><Logo /></li>

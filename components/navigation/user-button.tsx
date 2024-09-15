@@ -16,14 +16,17 @@ export function UserButton({ user }: UserButtonProps) {
         <div>
             {/* Display user email if available */}
             {user ? (
-                <div>{user.email}</div>
+                <div>
+                    <div>{user.email}</div>
+                    {/* <div>{user.image}</div> */}
+                </div>
             ) : null}
 
             {/* Conditionally render sign-in or sign-out button */}
             {!user ? (
-                <Link href="api/auth/signin/">
-                    <Button className="flex gap-2">
-                        <IoLogInOutline size={15}/>
+                <Link href="/auth/login" passHref>
+                    <Button className="flex gap-2" >
+                        <IoLogInOutline size={15} />
                         <span>Sign in</span>
                     </Button>
                 </Link>
