@@ -4,6 +4,7 @@ import prisma from "@/db";
 import { actionClient } from "@/safe-action";
 import { loginSchema } from "@/types/auth";
 import bcrypt from "bcryptjs"; 
+import { signIn } from "next-auth/react";
 
 export const emailSignin = actionClient.schema(loginSchema).action(async ({ parsedInput: { email, password } }) => {
     try {
@@ -17,12 +18,17 @@ export const emailSignin = actionClient.schema(loginSchema).action(async ({ pars
         }
 
         // Compare the provided password with the hashed password in the database
-        const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+        const isPasswordValid = await bcrypt.compare(password, existingUser.password as string);
 
         if (!isPasswordValid) {
             return { success: false, message: "Invalid password" };
         }
 
+        await signIn("credentials",{
+            email,
+            password,
+            redirectTo:"/",
+        })
         // If everything is okay, return success
         return { success: true, message: "Login successful", email: existingUser.email };
     } catch (error) {

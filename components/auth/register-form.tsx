@@ -49,7 +49,7 @@ export default function RegisterForm() {
         <CardWrapper
             label="Create Your Account"
             backButtonLabel="Already have an account? Login"
-            backButtonHref="/login"
+            backButtonHref="/auth/login"
             showSocials
             className="bg-white p-6 rounded-lg shadow-lg"
         >

@@ -56,3 +56,24 @@ enum Role {
   USER
   ADMIN
 }
+
+model EmailVerificationToken {
+  id      String   @default(cuid()) @id
+  email   String   @unique
+  token   String
+  expires DateTime
+}
+
+model passwordResetTokens {
+  id      String   @default(cuid()) @id
+  email   String   @unique
+  token   String
+  expires DateTime
+}
+
+model twoFactorToken {
+  id      String   @default(cuid()) @id
+  email   String   @unique
+  token   String
+  expires DateTime
+}
