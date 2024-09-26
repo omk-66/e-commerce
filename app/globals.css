@@ -150,3 +150,17 @@ body {
     --chart-5: 340 75% 55%;
   }
 }
+
+/* styles/globals.css */
+body {
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.dark {
+  background-color: #121212; /* Dark background */
+  color: #ffffff; /* Light text */
+}
+
+/* Additional styles for your components */
