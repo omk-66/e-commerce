@@ -50,7 +50,7 @@ export default function LoginForm() {
             backButtonLabel="Create a new account"
             backButtonHref="/auth/register"
             showSocials
-            className="bg-white p-6 rounded-lg shadow-lg"
+            className="bg-card p-6 rounded-lg shadow-lg"
         >
             <div className="max-w-sm mx-auto">
                 <Form {...form}>
@@ -60,16 +60,16 @@ export default function LoginForm() {
                             name="email"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-lg font-semibold text-gray-800">Email</FormLabel>
+                                    <FormLabel className="text-lg font-semibold text-foreground">Email</FormLabel>
                                     <FormControl>
                                         <Input
                                             placeholder="Enter your email"
                                             {...field}
                                             disabled={isExecuting}
-                                            className="border border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                            className="border border-border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-primary"
                                         />
                                     </FormControl>
-                                    <FormDescription className="text-sm text-gray-500"></FormDescription>
+                                    <FormDescription className="text-sm text-muted-foreground"></FormDescription>
                                     <FormMessage className="text-red-500" />
                                 </FormItem>
                             )}
@@ -79,7 +79,7 @@ export default function LoginForm() {
                             name="password"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-lg font-semibold text-gray-800">Password</FormLabel>
+                                    <FormLabel className="text-lg font-semibold text-foreground">Password</FormLabel>
                                     <div className="relative">
                                         <FormControl>
                                             <Input
@@ -87,7 +87,7 @@ export default function LoginForm() {
                                                 placeholder="********"
                                                 {...field}
                                                 disabled={isExecuting}
-                                                className="border border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                                className="border border-border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-primary"
                                             />
                                         </FormControl>
                                         <button
@@ -95,15 +95,15 @@ export default function LoginForm() {
                                             className="absolute right-3 top-1/2 transform -translate-y-1/2"
                                             onClick={() => setShowPassword(prev => !prev)}
                                         >
-                                            {showPassword ? <AiOutlineEyeInvisible className="text-gray-500" /> : <AiOutlineEye className="text-gray-500" />}
+                                            {showPassword ? <AiOutlineEyeInvisible className="text-muted-foreground" /> : <AiOutlineEye className="text-muted-foreground" />}
                                         </button>
                                     </div>
-                                    <FormDescription className="text-sm text-gray-500"></FormDescription>
+                                    <FormDescription className="text-sm text-muted-foreground"></FormDescription>
                                     <FormMessage className="text-red-500" />
                                 </FormItem>
                             )}
                         />
-                        <Button variant={"link"} size={"sm"} className="text-violet-500 hover:text-violet-700">
+                        <Button variant={"link"} size={"sm"} className="text-primary hover:text-primary-foreground">
                             Forgot password?
                         </Button>
                         {result.data?.success === false && <FormError message={result.data.message} />}
@@ -111,7 +111,7 @@ export default function LoginForm() {
                         <div className="flex">
                             <Button
                                 type="submit"
-                                className="w-full bg-violet-600 text-white rounded-md py-3 hover:bg-violet-700 transition-colors duration-300"
+                                className="w-full bg-primary text-primary-foreground rounded-md py-3 hover:bg-primary-foreground transition-colors duration-300"
                                 disabled={isSubmitting || !isValid}
                             >
                                 {isExecuting ? "😆" : "Login"}

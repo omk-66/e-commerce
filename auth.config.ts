@@ -6,12 +6,14 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import prisma from "./db"
 import { loginSchema } from "./types/auth"
 import bcrypt from "bcryptjs"
+import { string } from "zod"
+
 
 export default {
     adapter: PrismaAdapter(prisma),
-    session: {
-        strategy: "jwt"
-    },
+    // session: {
+    //     strategy: "jwt"
+    // },
     secret: process.env.AUTH_SECRET,
     providers: [
         GitHub({
@@ -49,11 +51,52 @@ export default {
                     throw new Error("Incorrect password");
                 }
 
-                return user; 
+                return user;
             }
         })
     ],
     pages: {
         signIn: "/auth/login"
+    },
+    callbacks: {
+        async session({ session, token }) {
+            if (token.sub) {
+                session.userId = token.sub;
+            }
+            if (token.role) {
+                session.user.role = token.role as string;
+            }
+            if (session.user) {
+                session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
+                session.user.name = token.name;
+                session.user.email = token.email as string;
+                session.user.isOAuth = token.isOAuth as boolean;
+                session.user.image = token.image as string;
+            }
+            return session;
+        },
+        async jwt({ token }) {
+            if (!token.sub) return token;
+
+            const existingUser = await prisma.user.findFirst({
+                where: { id: token.sub }
+            });
+
+            if (!existingUser) return token;
+
+            const existingAccount = await prisma.account.findFirst({
+                where: { userId: existingUser.id }
+            });
+
+            token.isOAuth = !!existingAccount;
+            token.name = existingUser.name;
+            token.email = existingUser.email;
+            token.role = existingUser.role;
+            token.isTwoFactorEnabled = existingUser.TwoFactorEnabled;
+            token.image = existingUser.image;
+
+            return token;
+        },
     }
+
 } satisfies NextAuthConfig;

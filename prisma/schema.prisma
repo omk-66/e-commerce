@@ -38,18 +38,19 @@ model Account {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  role          Role      @default(USER)
-  password      String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String    @id @default(cuid())
+  name             String?
+  email            String    @unique
+  emailVerified    DateTime?
+  image            String?
+  accounts         Account[]
+  role             Role      @default(USER)
+  password         String?
+  TwoFactorEnabled Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
+
 
 // Enum for user roles
 enum Role {
@@ -58,21 +59,21 @@ enum Role {
 }
 
 model EmailVerificationToken {
-  id      String   @default(cuid()) @id
+  id      String   @id @default(cuid())
   email   String   @unique
   token   String
   expires DateTime
 }
 
 model passwordResetTokens {
-  id      String   @default(cuid()) @id
+  id      String   @id @default(cuid())
   email   String   @unique
   token   String
   expires DateTime
 }
 
 model twoFactorToken {
-  id      String   @default(cuid()) @id
+  id      String   @id @default(cuid())
   email   String   @unique
   token   String
   expires DateTime

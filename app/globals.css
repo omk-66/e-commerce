@@ -3,20 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --background: #0a0a0a;
+  --background: #ffffff;
+  /* White background */
   --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Black text */
 }
 
 body {
-  color: var(--background);
-  background: var(--foreground);
+  color: var(--foreground);
+  background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -56,8 +51,10 @@ body {
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
+    --background: #ffffff;
+    /* White background */
+    --foreground: #171717;
+    /* Black text */
     --card: 0 0% 3.9%;
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 3.9%;
@@ -151,16 +148,20 @@ body {
   }
 }
 
-/* styles/globals.css */
-body {
-  margin: 0;
-  padding: 0;
-  transition: background-color 0.5s ease, color 0.5s ease;
-}
+@layer base {
+  :root {
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
 
-.dark {
-  background-color: #121212; /* Dark background */
-  color: #ffffff; /* Light text */
+  .dark {
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
 }
-
-/* Additional styles for your components */
