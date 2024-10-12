@@ -1,6 +1,7 @@
+import Link from "next/link";
 export function Logo() {
     return (
-        <div className="font-bold tracking-widest">LOGO</div>
+        <Link href={"/"}><div  className="font-bold tracking-widest">LOGO</div></Link>
     )
 }
 

@@ -6,7 +6,6 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
@@ -27,17 +26,19 @@ import { Switch } from "@/components/ui/switch";
 import { useState } from "react";
 import { FormSuccess } from "@/components/auth/form-success";
 import { FormError } from "@/components/auth/form-error";
+import { useAction } from "next-safe-action/hooks";
+import { settings } from "@/action/settings";
+import { UploadButton } from "@uploadthing/react";
 
 interface SettingsForm {
     session: Session;
 }
 
 export default function SettingsCard({ session }: SettingsForm) {
-    console.log("seesion is not genrate")
-    console.log(session)
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
-    const [avatarUploading, setAvtarUploading] = useState(false);
+    const { execute, result, isExecuting, hasErrored, hasSucceeded } = useAction(settings);
+
+    const [error, setError] = useState<string | undefined>(undefined);
+    const [success, setSuccess] = useState<string | undefined>(undefined);
 
     const form = useForm<z.infer<typeof settingsFormSchema>>({
         resolver: zodResolver(settingsFormSchema),
@@ -51,42 +52,42 @@ export default function SettingsCard({ session }: SettingsForm) {
         },
     });
 
-    // Simulated API request to update settings
-    async function updateSettings(values: z.infer<typeof settingsFormSchema>) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve({ success: true });
-            }, 1000);
-        });
-    }
-
     async function onSubmit(values: z.infer<typeof settingsFormSchema>) {
-        console.log(values)
-        form.reset();
+        setError(undefined);
+        setSuccess(undefined);
+        execute(values);
+
+        if (hasSucceeded) {
+            setSuccess(result.data?.success);
+            form.reset();
+        }
+        if (hasErrored) {
+            setError(result.data?.error);
+        }
     }
 
     return (
-        <Card className="max-w-2xl mx-auto border border-gray-200 shadow-lg rounded-lg bg-white">
-            <CardHeader className="p-6 border-b border-gray-200">
-                <CardTitle className="text-xl font-bold">Your Settings</CardTitle>
-                <CardDescription className="text-gray-600">
+        <Card className="max-w-lg mx-auto border border-gray-200 shadow-lg rounded-lg bg-white my-5 p-7">
+            <CardHeader className="p-4 border-b border-gray-200">
+                <CardTitle className="text-lg font-bold">Your Settings</CardTitle>
+                <CardDescription className="text-sm text-gray-600">
                     Update your account settings
                 </CardDescription>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent className="p-4">
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                        {/* Name Field */}
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         <FormField
                             control={form.control}
                             name="name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-sm font-medium">Name</FormLabel>
+                                    <FormLabel className="text-lg font-semibold">Name</FormLabel>
                                     <FormControl>
                                         <Input
-                                            className="border border-gray-300 p-2 rounded-md w-full"
+                                            className="border border-gray-300 p-3 rounded-md w-full"
                                             placeholder="Enter your name"
+                                            disabled={isExecuting}
                                             {...field}
                                         />
                                     </FormControl>
@@ -95,16 +96,15 @@ export default function SettingsCard({ session }: SettingsForm) {
                             )}
                         />
 
-                        {/* Avatar Field */}
                         <FormField
                             control={form.control}
                             name="image"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-sm font-medium">Avatar</FormLabel>
-                                    <div className="flex items-center gap-4">
+                                    <FormLabel className="text-lg font-semibold">Avatar</FormLabel>
+                                    <div className="flex items-center gap-3">
                                         {!form.getValues("image") && (
-                                            <div className="font-bold bg-gray-200 text-gray-700 rounded-full w-12 h-12 flex items-center justify-center">
+                                            <div className="font-bold bg-gray-200 text-gray-700 rounded-full w-10 h-10 flex items-center justify-center">
                                                 {session.user?.name?.charAt(0).toUpperCase()}
                                             </div>
                                         )}
@@ -113,10 +113,20 @@ export default function SettingsCard({ session }: SettingsForm) {
                                                 src={form.getValues("image") as string}
                                                 alt="user-image"
                                                 className="rounded-full"
-                                                width={42}
-                                                height={42}
+                                                width={40}
+                                                height={40}
                                             />
                                         )}
+                                        <UploadButton
+                                        className="ut-button:ring-primary"
+                                            endpoint="avtarUploader"
+                                            content={{
+                                                button({ready}) {
+                                                    if (ready) return <div>Change Avatar</div>;
+                                                    return <div>Uploading...</div>;
+                                                }
+                                            }}
+                                        />
                                     </div>
                                     <FormControl>
                                         <Input type="hidden" className="hidden" {...field} />
@@ -126,18 +136,18 @@ export default function SettingsCard({ session }: SettingsForm) {
                             )}
                         />
 
-                        {/* Password Field */}
                         <FormField
                             control={form.control}
                             name="password"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-sm font-medium">Password</FormLabel>
+                                    <FormLabel className="text-lg font-semibold">Password</FormLabel>
                                     <FormControl>
                                         <Input
                                             type="password"
-                                            className="border border-gray-300 p-2 rounded-md w-full"
+                                            className="border border-gray-300 p-3 rounded-md w-full"
                                             placeholder="********"
+                                            disabled={isExecuting || session.user.isOAuth}
                                             {...field}
                                         />
                                     </FormControl>
@@ -146,18 +156,18 @@ export default function SettingsCard({ session }: SettingsForm) {
                             )}
                         />
 
-                        {/* New Password Field */}
                         <FormField
                             control={form.control}
                             name="newPassword"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-sm font-medium">New Password</FormLabel>
+                                    <FormLabel className="text-lg font-semibold">New Password</FormLabel>
                                     <FormControl>
                                         <Input
                                             type="password"
-                                            className="border border-gray-300 p-2 rounded-md w-full"
+                                            className="border border-gray-300 p-3 rounded-md w-full"
                                             placeholder="********"
+                                            disabled={isExecuting || session.user.isOAuth}
                                             {...field}
                                         />
                                     </FormControl>
@@ -166,39 +176,36 @@ export default function SettingsCard({ session }: SettingsForm) {
                             )}
                         />
 
-                        {/* Two Factor Authentication */}
                         <FormField
                             control={form.control}
                             name="isTwoFactorEnabled"
                             render={({ field }) => (
-                                <FormItem className="flex justify-between items-center">
-                                    <FormLabel className="text-sm font-medium">
-                                        Two Factor Authentication
-                                    </FormLabel>
+                                <FormItem>
+                                    <FormLabel className="text-lg font-semibold">Two Factor Authentication</FormLabel>
                                     <FormControl>
                                         <Switch
-                                            id="twoFactorSwitch"
-                                            className="bg-gray-200 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                                            // {...field}
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                            disabled={isExecuting}
                                         />
                                     </FormControl>
-                                    <label htmlFor="twoFactorSwitch" className="sr-only">
-                                        Enable Two Factor Authentication
-                                    </label>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
 
-                        {/* Error and Success Messages */}
                         {error && <FormError message={error} />}
                         {success && <FormSuccess message={success} />}
 
-                        {/* Submit Button */}
-                        <Button
-                            type="submit" >
-                            Update Your Settings
-                        </Button>
+                        <div className="flex justify-center">
+                            <Button
+                                type="submit"
+                                className="w-full bg-primary text-primary-foreground rounded-md py-3  transition-colors duration-300"
+                                disabled={isExecuting}
+                            >
+                                {isExecuting ? "Updating..." : "Update Settings"}
+                            </Button>
+                        </div>
                     </form>
                 </Form>
             </CardContent>
