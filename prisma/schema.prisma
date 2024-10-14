@@ -51,7 +51,6 @@ model User {
   updatedAt        DateTime  @updatedAt
 }
 
-
 // Enum for user roles
 enum Role {
   USER
@@ -78,3 +77,12 @@ model twoFactorToken {
   token   String
   expires DateTime
 }
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  description String
+  title       String
+  created     DateTime @default(now())
+  price       Float
+}
+
