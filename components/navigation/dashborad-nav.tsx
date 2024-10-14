@@ -21,16 +21,14 @@ export function DashboardNavbar({ allLinks }: AllLinks) {
         <div className="relative">
             <ul className="flex gap-6 text-sm font-bold">
                 {allLinks.map((link, index) => (
-                    <li key={index} className="relative">
+                    <motion.li whileTap={{
+                        scale: 0.95
+                    }}  key={index} className="relative">
                         <Link href={link.path} className={cn("flex flex-col gap-1 items-center", pathname === link.path ? "text-primary" : "text-muted")}>
                             {link.icon}
                             {link.label}
                         </Link>
-                        {/* Motion indicator for active link */}
-                        {pathname === link.path && (
-                            <motion.div className="h-[3px] w-full rounded-full absolute bg-primary z-0 left-0" />
-                        )}
-                    </li>
+                    </motion.li>
                 ))}
             </ul>
         </div>

@@ -39,14 +39,21 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
     const allLinks = [...adminLinks, ...userLinks];
 
+    
     return (
-        <div>
-            <nav className="py-2 overflow-auto">
-                <ul className="flex gap-6 text-sm font-bold">
-                    <DashboardNavbar allLinks={allLinks}/>
-                </ul>
+        <div className="min-h-screen flex flex-col items-center bg-gray-50">
+            <nav className="w-full bg-white space-x-4 py-4">
+                <div className="container mx-auto px-4">
+                    <ul className="flex justify-center gap-6 text-sm font-semibold text-gray-700">
+                        <DashboardNavbar allLinks={allLinks}/>
+                    </ul>
+                </div>
             </nav>
-            <main>{children}</main>
+            <main className="flex-grow w-full container mx-auto px-4 py-8">
+                <div className="bg-white shadow-lg rounded-lg p-6 max-w-4xl mx-auto">
+                    {children}
+                </div>
+            </main>
         </div>
     );
 }
