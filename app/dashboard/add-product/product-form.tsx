@@ -28,15 +28,26 @@ import { FaRupeeSign } from "react-icons/fa";
 import Tiptap from "./tiptap";
 import { createProduct } from "@/action/create-product";
 import { useAction } from "next-safe-action/hooks";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { error } from "console";
 
 export default function ProductForm() {
+    const router = useRouter();
     const { execute, result, isExecuting, status } = useAction(createProduct, {
         onSuccess: (data) => {
             if (data.data?.success) {
                 console.log(data.data.success)
+                router.push("/dashboard/products");
+                toast.success(data.data?.success);
             }
         },
-        onError: (error) => console.log(error),
+        onError: (error) => {
+            toast.error(result.data?.error)
+        },
+        onExecute:(data) => {
+            toast.loading("Creating Product")
+        },
     });
 
     const form = useForm({
@@ -51,7 +62,6 @@ export default function ProductForm() {
 
     function onSubmit(values: zProductSchema) {
         execute(values);
-        form.reset();
     }
 
     return (

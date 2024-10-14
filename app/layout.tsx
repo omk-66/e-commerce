@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css"; 
 import { NavBar } from "@/components/navigation/nav";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import Toaster from "@/components/ui/toster"
 
 
 const geistSans = localFont({
@@ -38,6 +39,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <NavBar />
+            <Toaster />
             {children}
           </ThemeProvider>
       </body>
