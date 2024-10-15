@@ -180,7 +180,7 @@ export default function ProductForm() {
                     </form>
                 </Form>
             </CardContent>
-            <CardFooter>Card Footer</CardFooter>
+            {/* <CardFooter>Card Footer</CardFooter> */}
         </Card>
     );
 }

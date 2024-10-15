@@ -30,7 +30,7 @@ export function DashboardNavbar({ allLinks }: AllLinks) {
                             href={link.path}
                             className={cn(
                                 "flex flex-col gap-1 items-center",
-                                pathname === link.path ? "text-primary" : "text-muted"
+                                pathname === link.path ? "text-primary" : ""
                             )}
                         >
                             {link.icon}

@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
-import { FaBars, FaPenSquare, FaTruck } from "react-icons/fa";
-import { FcPackage, FcSettings } from "react-icons/fc";
+import { Truck, Settings, BarChart, PenTool, Package } from "lucide-react";
+
 import { DashboardNavbar } from "@/components/navigation/dashborad-nav";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -10,12 +10,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
         {
             label: "Orders",
             path: "/dashboard/orders",
-            icon: <FaTruck size={15} />
+            icon: <Truck size={15} />
         },
         {
             label: "Settings",
             path: "/dashboard/settings",
-            icon: <FcSettings size={15} />
+            icon: <Settings size={15} />
         }
     ] as const;
 
@@ -23,17 +23,17 @@ export default async function DashboardLayout({ children }: { children: React.Re
         {
             label: "Analytics",
             path: "/dashboard/analytics",
-            icon: <FaBars size={15} />
+            icon: <BarChart size={15} />
         },
         {
             label: "Create",
             path: "/dashboard/add-product",
-            icon: <FaPenSquare size={15} />
+            icon: <PenTool size={15} />
         },
         {
             label: "Products",
             path: "/dashboard/products",
-            icon: <FcPackage size={15} />
+            icon: <Package size={15} />
         }
     ] : [];
 
