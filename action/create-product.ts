@@ -3,6 +3,7 @@
 import { ProductSchema } from "@/types/product-schems";
 import { actionClient } from "@/safe-action";
 import prisma from "@/db";
+import { revalidatePath } from "next/cache";
 
 
 export const createProduct = actionClient.schema(ProductSchema).action(async ({ parsedInput }) => {
@@ -26,7 +27,7 @@ export const createProduct = actionClient.schema(ProductSchema).action(async ({ 
                     title
                 }
             });
-
+            revalidatePath("/dashboard/products")
             return { success: `${editedProduct.title} updated!` }
         } else {
 
@@ -38,7 +39,7 @@ export const createProduct = actionClient.schema(ProductSchema).action(async ({ 
                 }
             });
 
-
+            revalidatePath("/dashboard/products")
             return { success: `${newProduct.title} added!` }
 
 

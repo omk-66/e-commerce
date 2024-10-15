@@ -1,21 +1,18 @@
 "use client";
-
 import { ProductSchema, zProductSchema } from "@/types/product-schems";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
 import {
     Card,
     CardContent,
@@ -30,34 +27,68 @@ import { createProduct } from "@/action/create-product";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { error } from "console";
+import { useEffect, useState } from "react";
+import { MoonLoader } from "react-spinners";  // Import MoonLoader
+// import prisma from "@/db";
+import { getProduct } from "@/action/get-product";
+// import { revalidatePath } from "next/cache";
 
 export default function ProductForm() {
     const router = useRouter();
-    const { execute, result, isExecuting, status } = useAction(createProduct, {
-        onSuccess: (data) => {
-            if (data.data?.success) {
-                console.log(data.data.success)
+    const searchParams = useSearchParams();
+    const editMode = searchParams.get("id");
+
+    const checkProduct = async (id: number) => {
+        if (editMode) {
+            const { product, error, success } = await getProduct(id);
+            if (error) {
+                toast.error(error);
                 router.push("/dashboard/products");
-                toast.success(data.data?.success);
+                return
             }
-        },
-        onError: (error) => {
-            toast.error(result.data?.error)
-        },
-        onExecute:(data) => {
-            toast.loading("Creating Product")
-        },
-    });
+
+            if (success) {
+                const id = parseInt(editMode);
+                form.setValue("title", product.title);
+                form.setValue("description", product.description);
+                form.setValue("price", product.price);
+                form.setValue("id", parseInt(editMode))
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (editMode) {
+            checkProduct(parseInt(editMode))
+        }
+    }, [editMode])
 
     const form = useForm({
         defaultValues: {
+            id: editMode ? parseInt(editMode) : undefined,
             title: "",
             description: "",
             price: 0,
         },
         resolver: zodResolver(ProductSchema),
-        mode: "onChange"
+        mode: "onChange",
+    });
+
+    const { execute, result, isExecuting, status } = useAction(createProduct, {
+        onSuccess: (data) => {
+            toast.dismiss();
+            if (data.data?.success) {
+                router.push("/dashboard/products");
+                toast.success(data.data?.success);
+            }
+        },
+        onError: () => {
+            toast.dismiss();
+            toast.error(result.data?.error);
+        },
+        onExecute: () => {
+            toast.loading(editMode ? "Updating Product" : "Creating Product");
+        },
     });
 
     function onSubmit(values: zProductSchema) {
@@ -67,92 +98,89 @@ export default function ProductForm() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Create Product</CardTitle>
-                <CardDescription>Fill in the details to create a new product</CardDescription>
+                <CardTitle>{editMode ? "Edit Product" : "Create Product"}</CardTitle>
+                <CardDescription>Fill in the details {editMode ? "to edit" : "to create"} the product</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="">
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                            {/* Title Field */}
-                            <FormField
-                                control={form.control}
-                                name="title"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Title</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Product title" {...field} disabled={status === "executing"} />
-                                        </FormControl>
-                                        <FormDescription>
-                                            {/* The name of your product. */}
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                        {/* Title Field */}
+                        <FormField
+                            control={form.control}
+                            name="title"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Title</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Product title" {...field} disabled={status === "executing"} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
-                            {/* Description Field */}
-                            <FormField
-                                control={form.control}
-                                name="description"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Description</FormLabel>
-                                        <FormControl>
-                                            <Tiptap val={field.value} disabled={status === "executing"} />
-                                        </FormControl>
-                                        <FormDescription>
-                                            {/* Brief description of the product. */}
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                        {/* Description Field */}
+                        <FormField
+                            control={form.control}
+                            name="description"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Description</FormLabel>
+                                    <FormControl>
+                                        <Tiptap val={field.value} disabled={status === "executing"} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
-                            {/* Price Field */}
-                            <FormField
-                                control={form.control}
-                                name="price"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Price</FormLabel>
-                                        <FormControl>
-                                            <div className="flex items-center space-x-2">
-                                                <FaRupeeSign size={15} className=" text-primary" />
-                                                <Input
-                                                    disabled={status === "executing"}
-                                                    type="number"
-                                                    min={0}
-                                                    placeholder="Product price"
-                                                    {...field}
-                                                    // Convert the input value from string to number before validation
-                                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                                                    value={field.value}
-                                                    className="w-full"
-                                                />
-                                            </div>
-                                        </FormControl>
-                                        <FormDescription>
-                                            {/* Enter the product price in INR. */}
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            {/* <Button disabled={status === "executing" || !form.formState.isValid || !form.formState.isDirty} type="submit">
-                                Submit
-                            </Button> */}
-                            <Button disabled={status === "executing"} type="submit">
-                                Submit
-                            </Button>
-                        </form>
-                    </Form>
-                </div>
+                        {/* Price Field */}
+                        <FormField
+                            control={form.control}
+                            name="price"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Price</FormLabel>
+                                    <FormControl>
+                                        <div className="flex items-center space-x-2">
+                                            <FaRupeeSign size={15} className="text-primary" />
+                                            <Input
+                                                disabled={status === "executing"}
+                                                type="number"
+                                                min={0}
+                                                placeholder="Product price"
+                                                {...field}
+                                                onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                                value={field.value}
+                                                className="w-full"
+                                            />
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Submit Button with Loader */}
+                        <Button disabled={status === "executing"} type="submit" className="w-full">
+                            {isExecuting ? (
+                                <div className="flex items-center space-x-2">
+                                    <MoonLoader size={20} color="#fff" />  {/* Loader inside the button */}
+                                    <span>{editMode ? "Updating..." : "Submitting..."}</span>
+                                </div>
+                            ) : (
+                                <span>{editMode ? "Update" : "Submit"}</span>
+                            )}
+                        </Button>
+
+                        {/* Submit Button */}
+                        {/* <Button disabled={status === "executing"} type="submit">
+                            {editMode ? "Update" : "Submit"}
+                        </Button> */}
+                    </form>
+                </Form>
             </CardContent>
-            <CardFooter>
-                <p>Card Footer</p>
-            </CardFooter>
+            <CardFooter>Card Footer</CardFooter>
         </Card>
     );
 }

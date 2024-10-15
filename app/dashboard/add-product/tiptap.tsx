@@ -6,6 +6,7 @@ import Placeholder from '@tiptap/extension-placeholder'
 import { Toggle } from "@/components/ui/toggle"
 import { FaBold, FaItalic, FaListOl, FaListUl, FaStrikethrough } from 'react-icons/fa'
 import { useFormContext } from 'react-hook-form'
+import { useEffect } from 'react'
 
 const Tiptap = ({ val, disabled }: { val: string, disabled: boolean }) => {
     const { setValue } = useFormContext();
@@ -42,6 +43,10 @@ const Tiptap = ({ val, disabled }: { val: string, disabled: boolean }) => {
         },
         content: val,
     })
+
+    useEffect(() => {
+        if(editor?.isEmpty) editor.commands.setContent(val)
+    },[val]);
 
     return (
         <div className='flex flex-col gap-2'>
