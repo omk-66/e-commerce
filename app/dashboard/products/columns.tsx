@@ -1,10 +1,17 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontalIcon } from "lucide-react"
+import { MoreHorizontalIcon, PlusCircle } from "lucide-react"
 // import { useAction } from "next-safe-action/hooks"
 import { createProduct } from "@/action/create-product"
 import { deleteProducat } from "@/action/delete-producat"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -17,6 +24,8 @@ import {
 import Image from "next/image"
 import { toast } from "sonner"
 import Link from "next/link"
+import { ProductVariantType } from "@/lib/infer-types"
+import ProductVariant from "./product-variant"
 
 interface ProductColums {
     id: number,
@@ -64,6 +73,47 @@ export const columns: ColumnDef<ProductColums>[] = [
     {
         accessorKey: "variants",
         header: "Variants",
+        cell: ({ row }) => {
+            const variants = row.getValue("variants") as ProductVariantType[]; // Ensure type assertion
+            return (
+                <div>
+                    {variants.map((variant) => ( 
+                        <div key={variant.id}>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <ProductVariant productID={variant.id} variant={variant} editMode={true}>
+                                            <div className="w-5 h-5 rounded-full" key={variant.id} style={{
+                                                background: variant.color
+                                            }}/>
+                                        </ProductVariant>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{variant.productType}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </div>
+                    ))}
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                {/* <span className="text-primary"><PlusCircle className="w-4 h-4" /></span> */}
+                                <span>
+                                <ProductVariant editMode={false} >
+                                    <PlusCircle className="h-5 w-5"/>
+                                </ProductVariant>
+                                </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Create a new variant</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
+                </div>
+            );
+        },
     },
     {
         accessorKey: "price",
@@ -103,7 +153,7 @@ export const columns: ColumnDef<ProductColums>[] = [
                     <DropdownMenuContent>
                         <DropdownMenuItem className="focus:bg-primary/50 cursor-pointer" ><Link href={`/dashboard/add-product?id=${product.id}`}>Edit Product</Link></DropdownMenuItem>
                         <DropdownMenuItem className="focus:bg-destructive/50 cursor-pointer"
-                        onClick={() => deleteProducatWrapper(product.id)} >Delete Product</DropdownMenuItem>
+                            onClick={() => deleteProducatWrapper(product.id)} >Delete Product</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             )
